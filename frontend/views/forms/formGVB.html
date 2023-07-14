@@ -1,0 +1,599 @@
+//<script type="text/jsx">
+
+var n, id;
+const fechaCreado = new Date().toLocaleString() + " ";
+const fId = Date.now();
+const a = [0, 0, 0, 0, 0, 0, 0,0];
+let valor;
+let hid1 = true;
+let hid2 = true;
+var creadoPor;
+const formGVB = () => {
+    //const fechaCreado = new Date().toLocaleString() + " ";
+    //const fId = Date.now();
+
+    useEffect(User)
+
+    const [values, setValues] = useState();
+
+    function User() {
+        google.script.run.withSuccessHandler(res => {
+            creadoPor = (res)
+            cantRow()
+        }).email();
+    }  
+
+    function cantRow() {
+      google.script.run.withSuccessHandler(res => {
+            n = res;
+      }).cantRows();
+    } 
+  
+     const checkData = (e) => {
+        const { name, value } = e.target;
+        id = "GV-" + fId + "-" + Math.floor(n + 1);
+        console.log(name, value)
+
+        if (e.target.name === 'tipoServicio') {
+            if(e.target.value === 'Propio') hid1 = false; else hid1 = true;
+            if(e.target.value === 'Tercero') hid2 = false; else hid2 = true;
+
+        }
+
+        if(e.target.name === 'distanciaBase') {
+            if(e.target.value === 'Menos de 50 Km') {
+                a[0] = 1;
+            } else if(e.target.value === 'Menos de 100 Km') {
+                a[0] = 2;
+            } else if(e.target.value === 'Menos de 200 Km') {
+                a[0] = 5;
+            } else if(e.target.value === 'Mas de 200 Km') {
+                a[0] = 8;
+            }
+        } else if(e.target.name === 'clima') {
+            if(e.target.value === 'Seco') {
+                a[1] = 1;
+            } else if(e.target.value === 'Viento') {
+                a[1] = 2;
+            } else if(e.target.value === 'Lluvia') {
+                a[1] = 4;
+            } else if(e.target.value === 'Neblina') {
+                a[1] = 8;
+            } 
+        } else if(e.target.name === 'vehiculoPasajero') {
+            if(e.target.value === '2 o mas vehículos con 2 o mas personas por vehículo') {
+                a[2] = 1;
+            } else if(e.target.value === '2 o mas vehículos con 1 persona por vehículo') {
+                a[2] = 2;
+            } else if(e.target.value === '1 vehículo con 2 o mas persona') {
+                a[2] = 3;
+            } else if(e.target.value === '1 vehículo con 1 persona') {
+                a[2] = 6;
+            } 
+        } else if(e.target.name === 'condicionesVia') {
+            if(e.target.value === 'Pavimentada') {
+                a[3] = 1;
+            } else if(e.target.value === 'Mixta') {
+                a[3] = 2;
+            } else if(e.target.value === 'No pavimentada') {
+                a[3] = 4;
+            } 
+        } else if(e.target.name === 'comunicacióndisponible') {
+            if(e.target.value === 'Telf. celular / Equipo de com. Radial') {
+                a[4] = 0;
+            } else if(e.target.value === 'Sin comunicación con convoy') {
+                a[4] = 2;
+            } else if(e.target.value === 'Sin comunicación sin convoy') {
+                a[4] = 4;
+            } 
+        } else if(e.target.name === 'horasTrabTiempoViaje') {
+            if(e.target.value === 'Horas trabajadas + horas previstas de viaje < 12 hs.') {
+                a[5] = 1;
+            } else if(e.target.value === 'Horas trabajadas + horas previstas de viaje < 14 hs.') {
+                a[5] = 3;
+            } else if(e.target.value === 'Horas trabajadas + horas previstas de viaje < 16 hs.') {
+                a[5] = 6;
+            } 
+        } else if(e.target.name === 'riesgoseguridadfisica') {
+            if(e.target.value === 'Alto') {
+                a[6] = 5;
+            } else if(e.target.value === 'Medio') {
+                a[6] = 2;
+            } else if(e.target.value === 'Bajo') {
+                a[6] = 1;
+            } 
+        } else if(e.target.name === 'horaViajes') {
+            if(e.target.value === 'Día (5:00 - 18:00)') {
+                a[7] = 1;
+            } else if(e.target.value === 'Noche (18:00 - 5:00)') {
+                a[7] = 8;
+            }  
+        } 
+        valor = a[0] + a[1] + a[2] + a[3] + a[4] + a[5] + a[6] + a[7]
+        setValues({...values, [name]: value})
+    }
+
+    const saveData = (e) => {   
+        e.preventDefault()
+        const estado = "Pendiente"
+         notificacionGuardando("Guardando Usuario");
+        google.script.run.withSuccessHandler(resp => {
+            e.target.reset();
+            notificacionTareaTerminada(resp.titulo, resp.descripcion);
+            
+           /*  hid1 = true;
+            hid2 = true;
+            valor[0] = 0;
+            valor[1] = 0;
+            valor[2] = 0;
+            valor[3] = 0;
+            valor[4] = 0;
+            valor[5] = 0;
+            valor[6] = 0;
+            valor[7] = 0; */
+        }).saveGV(JSON.stringify({ id, fechaCreado, creadoPor, estado, valor, ...values } ));
+    }
+
+    return(
+        <div>
+            <div className="badge bg-primary text-white fst-italic mt-3 mb-3" style={{fontSize: '.9rem'}}>Registro de Gerencia de Viaje Creado Por: {creadoPor}</div>
+            <div className="d-flex justify-content-between">
+                <div className="input-group mb-3">
+                    <span className="input-group-text">Fecha Creado</span>
+                    <span  className="form-control">{fechaCreado}</span>
+                </div>
+                <div className="input-group mb-3">
+                    <span className="input-group-text">ID</span>
+                    <span  className="form-control">{id}</span>
+                </div>
+            </div>
+           <form className="needs-validation" onSubmit={saveData}>
+            <div className="card shadow bg-body-tertiary rounded mb-3">
+                <div className="card-header bg-secondary text-white">Datos Generales</div>
+                <div className="card-body">
+                    <div className="row g-3">
+                        <div className="col">
+                        <div className="input-group input-group-sm mb-3">
+                        <span className="input-group-text" label="Fecha de Viaje">Fecha de Viaje</span>
+                            <input type="date" className="form-control" name="fechaViaje" label="Fecha del Viaje"  locale="es" onChange={checkData} required>
+                            </input>
+                        </div>
+                        </div>
+                        <div className="col">
+                            <select className="form-select form-select-sm" name="empresa" required onChange={checkData}>
+                                    <option value=" ">Empresa</option>
+                                    <option value="COOSERPOZ">COOSERPOZ</option>
+                                    <option value="DYNAXTREAM">DYNAXTREAM</option>
+                                    <option value="ENTERGIX">ENTERGIX</option>
+                                    <option value="ESSENTIAL OFS">ESSENTIAL OFS</option>
+                                    <option value="INTEGRA WS">INTEGRA WS</option>
+                                    <option value="KYBALION TECHNOLOGIES">KYBALION TECHNOLOGIES</option>
+                                    <option value="NEOCONEX">NEOCONEX</option>
+                                    <option value="PETROALIANZA">PETROALIANZA</option>
+                                    <option value="PETROALIANZA ORIENTE">PETROALIANZA ORIENTE</option>
+                                    <option value="PROILIFT">PROILIFT</option>
+                                    <option value="SINOENERGY">SINOENERGY</option>
+                                    <option value="TECNO">TECNO CONSULTORES</option>
+                                    <option value="XENIXS">XENIXS</option>
+                                    <option value="XPERTS">XPERTS</option>
+                            </select>
+                        </div>
+                        <div className="col">
+                            <select className="form-select form-select-sm" name="departamento" required onChange={checkData}>
+                                <option>Departamento</option>
+                                <option value="Activos Fijos, Control y Gestion">Activos Fijos, Control y Gestión</option>
+                                <option value="Administracion y Finanzas">Administración y Finanzas</option>
+                                <option value="Almacen">Almacen</option>
+                                <option value="Comercialización">Comercialización</option>
+                                <option value="Facilidades y Servicios Generales">Facilidades y Servicios Generales</option>
+                                <option value="Gerencia General">Gerencia General</option>
+                                <option value="Gestion de Talento Humano">Gestion de Talento Humano</option>
+                                <option value="Hot Oiler">Hot Oiler</option>
+                                <option value="HSE">HSE</option>
+                                <option value="IT">IT</option>
+                                <option value="Junta Directiva">Junta Directiva</option>
+                                <option value="Legal">Legal</option>
+                                <option value="Logistica">Logistica</option>
+                                <option value="Mantenimiento">Mantenimiento</option>
+                                <option value="Medios e imagen corporativa">Medios e imagen corporativa</option>
+                                <option value="Operaciones">Operaciones</option>
+                                <option value="Operaciones (Coiled Tubing)">Operaciones (Coiled Tubing)</option>
+                                <option value="Operaciones (Guaya Electrica)">Operaciones (Guaya Electrica)</option>
+                                <option value="Operaciones (Guaya Fina)">Operaciones (Guaya Fina)</option>
+                                <option value="Operaciones (Well Testing)">Operaciones (Well Testing)</option>
+                                <option value="Procura">Procura</option>
+                                <option value="Proyectos - Planificacion - Estimacion de costos">Proyectos - Planificación - Estimación de costos</option>
+                                <option value="Riesgos">Riesgos</option>
+                                <option value="Tesoreria">Tesoreria</option>
+                                <option value="UnixfyOne E&S">UnixfyOne E&S</option>
+                                <option value="Ventas">Ventas</option>
+                                <option value="Yacimientos">Yacimientos</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="row g-2">
+                        <div className="col">
+                        <div className="input-group input-group-sm mb-3">
+                            <span className="input-group-text" >Viaje Necesario</span>
+                            <div className="flex-sm justify-content-evenly">
+                            <div className="form-check form-check-inline">
+                                <input className="form-check-input" type="radio" name="viajenecesario" value="Si" onChange={checkData} required></input>
+                                <label className="form-check-label">SI</label>
+                            </div>
+                            <div className="form-check form-check-inline">
+                                <input className="form-check-input" type="radio" name="viajenecesario" value="No" onChange={checkData}></input>
+                                <label className="form-check-label">NO</label>
+                            </div>
+                            </div>
+                        </div>
+                        <div className="input-group input-group-sm mb-3">
+                            <span className="input-group-text">Motivo del Viaje</span>
+                            <input type="text" className="form-control" name="motivoViaje" onChange={checkData} required></input>
+                        </div>
+                        </div>
+                    </div>
+
+                    <div className="row g-4">
+                        <div className="col">
+                        <div className="input-group input-group-sm mb-3">
+                            <span className="input-group-text">Lugar de Salida</span>
+                            <input type="text" className="form-control" name="lugarSalida" onChange={checkData} required></input>
+                        </div>
+                        </div>
+
+                        <div className="col">
+                        <div className="input-group input-group-sm mb-3">
+                            <span className="input-group-text">Hora Salida</span>
+                            <input type="time" className="form-control" name="horaSalida" onChange={checkData} required></input>
+                        </div>
+                        </div>
+                        <div className="col">
+                        <div className="input-group input-group-sm mb-3">
+                            <span className="input-group-text">Lugar de Llegada</span>
+                            <input type="text" className="form-control" name="lugarLlegada" onChange={checkData} required></input>
+                        </div>
+                        </div>
+                        <div className="col">
+                        <div className="input-group input-group-sm mb-3">
+                            <span className="input-group-text">Hora Llegada</span>
+                            <input type="time" className="form-control" name="horaLlegada" onChange={checkData} required></input>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="card shadow bg-body-tertiary rounded mb-3">
+                <div className="card-header bg-secondary text-white">Selección Unidad y Agregar Pasajeros</div>
+                <div className="card-body">
+                    <div className="row g-3">
+                        <div className="col">
+                            <select className="form-select form-select-sm" name="tipoServicio" required onChange={checkData}>
+                                    <option value=" ">Seleccione Servicio</option>
+                                    <option value="Propio">Propio</option>
+                                    <option value="Tercero">Tercero</option>
+                            </select>
+                        </div>
+                       
+                        <div className="col">
+                            <select className="form-select form-select-sm" name="vehiculo" onChange={checkData} hidden={hid1}>
+                                <option>Seleccione Vehiculo</option>
+                                <option value="vehiculoPropio">vehiculoPropio</option>
+                                <option value="vehiculoPropio">vehiculoPropio1</option>
+                             </select>
+                             <select className="form-select form-select-sm" name="vehiculo" onChange={checkData} hidden={hid2}>
+                                <option>Seleccione Vehiculo</option>
+                                <option value="Tecero">Tecero</option>
+                                <option value="Tecero">Tecero1</option>
+                            </select>
+                        </div>     
+                        <div className="col">
+                            <div className="input-group input-group-sm mb-3" hidden={hid1}>
+                                <span className="input-group-text">Nombre Conductor</span>
+                                <input type="text" className="form-control" name="nombreConductor" onChange={checkData} hidden={hid1}></input>
+                            </div>
+                            <div className="input-group input-group-sm mb-3" hidden={hid2}>
+                                <span className="input-group-text">Nombre Conductor</span>
+                                <input type="text" className="form-control" name="nombreConductor" onChange={checkData} hidden={hid2}></input>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="row">
+                        <div className="col"> 
+                            <span className="input-group-text mb-2">Pasajeros Nombre  y Telefono</span>
+                            <div className="input-group input-group-sm mb-3">
+                                <span className="input-group-text" >Pasajero 1</span>
+                                <input type="text" className="form-control" name="pasajero1" onChange={checkData}></input>
+                            </div>
+                            <div className="input-group input-group-sm mb-3">
+                                <span className="input-group-text" >Pasajero 2</span>
+                                <input type="text" className="form-control" name="pasajero2" onChange={checkData}></input>
+                            </div>
+                            <div className="input-group input-group-sm mb-3">
+                                <span className="input-group-text" >Pasajero 3</span>
+                                <input type="text" className="form-control" name="pasajero3" onChange={checkData}></input>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="card shadow bg-body-tertiary rounded mb-3">
+            <div className="card-header bg-secondary text-white">Evaluaciones</div>
+                <div className="card-body">
+                <div className="badge bg-primary text-white mt-1 mb-3" style={{fontSize: '.9rem'}}>Evaluo Viaje: {valor}</div>
+                    <div className="row g-2">
+                            <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">Distancia desde Base</span>
+                                    <div className="ms-2 bg-white border rounded">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="distanciaBase" value="Menos de 50 Km" onChange={checkData} required></input>
+                                            <label className="form-check-label">Menos de 50 Km</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="distanciaBase" value="Menos de 100 Km" onChange={checkData}></input>
+                                            <label className="form-check-label">Menos de 100 Km</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="distanciaBase" value="Menos de 200 Km" onChange={checkData}></input>
+                                            <label className="form-check-label">Menos de 200 Km</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="distanciaBase" value="Mas de 200 Km" onChange={checkData}></input>
+                                            <label className="form-check-label">Mas de 200 Km</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                    <div className="row g-2">
+                            <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">Clima</span>
+                                    <div className="ms-2 bg-white border rounded">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="clima" value="Seco" onChange={checkData} required></input>
+                                            <label className="form-check-label">Seco</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="clima" value="Viento" onChange={checkData}></input>
+                                            <label className="form-check-label">Viento</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="clima" value="Lluvia" onChange={checkData}></input>
+                                            <label className="form-check-label">Lluvia</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="clima" value="Neblina" onChange={checkData}></input>
+                                            <label className="form-check-label">Neblina</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                    <div className="row g-2">
+                        <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">Vehículos y Pasajeros</span>
+                                    <div className="ms-2 bg-white border rounded">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="vehiculoPasajero" value="2 o mas vehículos con 2 o mas personas por vehículo" onChange={checkData} required></input>
+                                            <label className="form-check-label">2 o mas vehículos con 2 o mas personas por veh.</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="vehiculoPasajero" value="2 o mas vehículos con 1 persona por vehículo" onChange={checkData}></input>
+                                            <label className="form-check-label">2 o mas vehículos con 1 persona por veh.</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="vehiculoPasajero" value="1 vehículo con 2 o mas persona" onChange={checkData}></input>
+                                            <label className="form-check-label">1 vehículo con 2 o mas persona</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="vehiculoPasajero" value="1 vehículo con 1 persona" onChange={checkData}></input>
+                                            <label className="form-check-label">1 vehículo con 1 persona</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div className="row g-2">
+                        <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">Condiciones de las Vías</span>
+                                    <div className="ms-2 bg-white border rounded">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="condicionesVia" value="Pavimentada" onChange={checkData} required></input>
+                                            <label className="form-check-label">Pavimentada</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="condicionesVia" value="Mixta" onChange={checkData}></input>
+                                            <label className="form-check-label">Mixta</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="condicionesVia" value="No pavimentada" onChange={checkData}></input>
+                                            <label className="form-check-label">No pavimentada</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div className="row g-2">
+                        <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">Comunicación Disponible</span>
+                                    <div className="ms-2 bg-white border rounded">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="comunicacióndisponible" value="Telf. celular / Equipo de com. Radial" onChange={checkData} required></input>
+                                            <label className="form-check-label">Telf. celular / Equipo de com. Radial</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="comunicacióndisponible" value="Sin comunicación con convoy" onChange={checkData}></input>
+                                            <label className="form-check-label">Sin comunicación con convoy</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="comunicacióndisponible" value="Sin comunicación sin convoy" onChange={checkData}></input>
+                                            <label className="form-check-label">Sin comunicación sin convoy</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div className="row g-2">
+                        <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">Horas trabajadas + Tiempo de viaje</span>
+                                    <div className="ms-2 bg-white border rounded">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="horasTrabTiempoViaje" value="Horas trabajadas + horas previstas de viaje < 12 hs." onChange={checkData}></input>
+                                            <label className="form-check-label">Horas trabajadas + horas previstas de viaje menos a 12 hs.</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="horasTrabTiempoViaje" value="Horas trabajadas + horas previstas de viaje < 14 hs." onChange={checkData}></input>
+                                            <label className="form-check-label">Horas trabajadas + horas previstas de viaje menos a 14 hs.</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="horasTrabTiempoViaje" value="Horas trabajadas + horas previstas de viaje < 16 hs." onChange={checkData}></input>
+                                            <label className="form-check-label">Horas trabajadas + horas previstas de viaje menos a 16 hs.</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <span className="input-group-text">Trabajo + viaje Mayor a 16 hs. <span className="bg-danger text-white border rounded">No es permitido conducir</span></span>
+                                            
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                        </div>
+                    </div>
+                    <div className="row g-2">
+                        <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">Riesgo de seguridad física de viaje</span>
+                                    <div className="ms-2 bg-white border rounded">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="riesgoseguridadfisica" value="Alto" onChange={checkData} required></input>
+                                            <label className="form-check-label">Alto</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="riesgoseguridadfisica" value="Medio" onChange={checkData}></input>
+                                            <label className="form-check-label">Medio</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="riesgoseguridadfisica" value="Bajo" onChange={checkData}></input>
+                                            <label className="form-check-label">Bajo</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div className="row g-2">
+                        <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">Hora de Viaje</span>
+                                    <div className="ms-2 bg-white border rounded">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="horaViajes" value="Día (5:00 - 18:00)" onChange={checkData} required></input>
+                                            <label className="form-check-label">Día (5:00 - 18:00)</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="horaViajes" value="Noche (18:00 - 5:00)" onChange={checkData}></input>
+                                            <label className="form-check-label">Noche (18:00 - 5:00)</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div className="card shadow bg-body-tertiary rounded mb-3">
+                <div className="card-header bg-secondary text-white">Puntos Claves para el Viaje</div>
+                <div className="card-body">
+                    <div className="row g-2">
+                            <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                     <span className="input-group-text">Secuencia del Viaje</span>
+                                    <input type="text" className="form-control" name="secuenciaViaje" onChange={checkData} required></input>
+                                </div>
+                            </div>
+                    </div>
+                    <div className="row g-2">
+                            <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                     <span className="input-group-text">Puntos de reunión / Paradas</span>
+                                    <input type="text" className="form-control" name="puntosReunion" onChange={checkData} required></input>
+                                </div>
+                            </div>
+                    </div>
+                    <div className="row g-2">
+                        <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">El conductor realizo el formato EME-1 y/o inspección de vehículo</span>
+                                    <div className="ms-2 bg-white border rounded">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="formatoEME1" value="SI" onChange={checkData} required></input>
+                                            <label className="form-check-label">SI</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="formatoEME1" value="NO" onChange={checkData}></input>
+                                            <label className="form-check-label">NO</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div className="row g-2">
+                        <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">Segun Inspección EME-1, vehiculo en condición para Viaje</span>
+                                    <div className="ms-2 bg-white border rounded">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="EME1VehiCondicion" value="SI" onChange={checkData} required></input>
+                                            <label className="form-check-label">SI</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="EME1VehiCondicion" value="NO" onChange={checkData}></input>
+                                            <label className="form-check-label">NO</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div className="row g-2">
+                        <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">El monitor de conducción DrivePA esta funcionando correctamente</span>
+                                    <div className="ms-2 bg-white border rounded">
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="DrivePA" value="SI" onChange={checkData} required></input>
+                                            <label className="form-check-label">SI</label>
+                                        </div>
+                                        <div className="form-check form-check-inline">
+                                            <input className="form-check-input" type="radio" name="DrivePA" value="NO" onChange={checkData}></input>
+                                            <label className="form-check-label">NO</label>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div className="row g-2">
+                        <div className="col">
+                                <div className="input-group input-group-sm mb-3">
+                                    <span className="input-group-text">Observaciónes Adicionales</span>
+                                    <input type="text" className="form-control" name="observaciones" onChange={checkData}></input>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button className='btn btn-primary btn-block'>Registrar</button>
+        </form>
+    </div>
+    )
+}
+
+//</script>

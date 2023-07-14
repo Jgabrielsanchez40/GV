@@ -1,0 +1,19 @@
+//<script type="text/jsx">
+//<Route path="/FormRegistre" component={FormRegistre} />
+
+function Routes() {
+    return(
+        <Router>
+            <Header />
+            <Redirect to="/"/>
+            <Switch>
+                <Route exact path="/" component={Inicio} />
+                <Route exact path="/formGVB/" component={formGVB} />
+                <Route exact path="/listaRequest" component={listaRequest} />
+
+                <Route exact path="/formEdit/:id?" component={formEdit} />
+            </Switch>
+        </Router>
+    );
+}
+//</script>

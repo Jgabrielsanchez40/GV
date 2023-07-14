@@ -1,0 +1,25 @@
+//<script type="text/jsx">
+var email;
+function Inicio() {
+  
+  useEffect(User)
+
+  function User() {
+    google.script.run.withSuccessHandler(res => {
+        email = (res)
+    }).email();
+}  
+
+  return (
+    <div>
+     <div>Inicio </div>
+      <div>
+        <h1>{email}</h1>    
+      </div>
+    </div>
+   
+    
+  )
+}
+
+//</script>

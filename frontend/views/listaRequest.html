@@ -1,0 +1,78 @@
+//<script type="text/jsx">
+
+let creado;
+
+function listaRequest() {
+   const [dataSource, setdataSource] = useState([]);
+   useEffect(listar, [])
+   const history = useHistory()
+
+    function User() {
+      google.script.run.withSuccessHandler(res => {
+          creado = (res)
+    }).email();
+  }  
+    
+    async function listar() {
+      User();
+      
+       await google.script.run.withSuccessHandler(res => {
+        const request = JSON.parse(res);
+        let arreglo = [];
+        
+        request.map(user => {
+          if(user.creadoPor === creado) {
+            arreglo.push({...user})
+          }
+          
+        })
+        
+        /* request.map(user => {
+          arreglo.push({...user})
+        }) */
+        setdataSource(arreglo);
+       }).listarRequest();
+      }
+
+      function handCheck(id) {
+        history.push("/formEdit/" + id)
+      }
+      
+      return (
+        <div className="container-sm mt-5 py-5 bg-light bg-opacity-10 rounded shadow top-5">
+          <table className="table table-striped">
+          <thead>
+            <tr>
+            <th scope="ID">ID</th>
+              <th scope="Fecha Creado">Fecha Creado</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Fecha de Viaje</th>
+              <th scope="col">Desde</th>
+              <th scope="col">Hasta</th>
+              <th scope="col">Puntuación Viaje</th>
+              <th scope="col">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dataSource.map((datos) => ( 
+              <tr key={datos.id}>
+                <td scope="row" >{datos.id}</td>
+                <td scope="row">{datos.fechaCreado}</td>
+                <td scope="row">{datos.estado}</td>
+                <td>{datos.fechaViaje}</td>
+                <td>{datos.lugarSalida}</td>
+                <td>{datos.lugarLlegada}</td>
+                <td>{datos.valor}</td>
+                  <td><button className="btn bg-success text-white" onClick={() => {handCheck(datos.id)}}>Ver</button> 
+                   {/* { datos.estado === 'Pendiente' ? <button onClick={() => {handCheck(datos.estado, datos.id)}}>Editar</button> : <button>Ver</button> } */}
+                </td>
+             </tr>
+             
+            ))}
+          </tbody>
+        </table>
+        </div>
+      )
+    }
+    
+//</script>
