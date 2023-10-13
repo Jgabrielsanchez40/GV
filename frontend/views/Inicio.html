@@ -1,24 +1,50 @@
 //<script type="text/jsx">
 var email;
 function Inicio() {
-  
-  useEffect(User)
-
-  function User() {
-    google.script.run.withSuccessHandler(res => {
-        email = (res)
-    }).email();
-}  
-
+ 
   return (
-    <div>
-     <div>Inicio </div>
+    <div className="container-sm rounded shadow" style={{"marginTop": '2rem'}}>
       <div>
-        <h1>{email}</h1>    
+        <h2>Sistema de Gerencia de Viaje</h2>
+        <p className="p-2 bg-primary-subtle bg-opacity-10 border border-warning border-start-0 rounded-end fst-italic">Permite el Ingreso, control, seguimiento y aprobaciones de las solicitudes de traslado vehicular</p>  
       </div>
+
+      <div className="container-sm rounded shadow-sm" style={{"marginTop": '2rem'}}>
+        <h4>Niveles de Aprobaciones Según Evaluación del Viaje</h4>
+        <table className="table table-hover">
+          <thead className="bg-secondary text-white text-center">
+            <tr>
+              <th className="p-2">Nivel</th>
+              <th className="p-2">Puntaje Evaluación</th>
+              <th className="p-2">Aprobadores</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="bg-success text-white text-center">1</td>
+              <td className="text-center">14</td>
+              <td className="text-center">Coordinador del Servicio / Área o Gerente de Guardia. </td>
+            </tr>
+            <tr>
+              <td className="bg-warning-subtle text-center">2</td>
+              <td className="text-center">Entre 14 y 21</td>
+              <td className="text-center">Gerente del Servicio / área o Gerente de Guardia. </td>
+            </tr>
+            <tr>
+              <td className="bg-warning text-white text-center">3</td>
+              <td className="text-center">Entre 21 y 27</td>
+              <td className="text-center">Gerente de División o Gerente de Guardia.  </td>
+            </tr>
+            <tr>
+              <td className="bg-danger text-white text-center">4</td>
+              <td className="text-center">Mayor a 27</td>
+              <td className="text-center">Gerente HSEQ País. </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div><hr/></div>
     </div>
-   
-    
   )
 }
 

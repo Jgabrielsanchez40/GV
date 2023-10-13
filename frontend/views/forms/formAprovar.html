@@ -1,0 +1,101 @@
+//<script type="text/jsx">
+
+  let creado;
+  const fechaAprovado = new Date().toLocaleString() + " ";
+  function formAprovar() {
+     const [dataSource, setdataSource] = useState([]);
+     useEffect(listar, [])
+     const history = useHistory()
+
+      async function User() {
+        await google.script.run.withSuccessHandler(res => {
+            creado = (res)
+      }).email();
+    }
+
+      async function listar() {
+        User();
+         await google.script.run.withSuccessHandler(res => {
+          const request = JSON.parse(res);
+          let arreglo = [];
+          request
+          .sort((a, b) =>  b.fechaCreado > a.fechaCreado ? 1 : -1)
+          .map(user => {
+            if(user.emailaprobador === creado) {
+              arreglo.push({...user})
+            }
+          })
+          setdataSource(arreglo);
+         }).listarRequest();
+        }
+
+        function handCheck(id) {
+          history.push("/formEdit/" + id)
+        }
+
+        async function handAprover(id, creadoPor, estado, valor, niveL, emailaprobador, fechaViaje, motivoViaje, horaSalida) {
+          await google.script.run.withSuccessHandler(res => {
+           listar()
+           Semail(id, fechaAprovado, creadoPor, estado, valor, niveL, emailaprobador, fechaViaje, motivoViaje, horaSalida)
+          }).resAprovado(id, estado, fechaAprovado)
+        }
+
+        function Semail(id, fechaCreado, creadoPor, estado, valor, niveL, emailaprobador, fechaViaje, motivoViaje, horaSalida) {
+          google.script.run.withSuccessHandler(resp => {
+           // console.log(resp)
+          }).emailSend(id, fechaCreado, creadoPor, estado, valor, niveL, emailaprobador, fechaViaje, motivoViaje, horaSalida)
+        }
+
+        const bcolor = (kfalta) => {
+          if(kfalta == "Rejectado") return ('#dc3545')
+          else if(kfalta == "Pendiente") return ('#ffc107')
+          else if(kfalta == "Aprobado") return ('#198754')
+
+          else if(kfalta === 1) return ('#18A558')
+          else if(kfalta === 2) return ('#D6AD60')
+          else if(kfalta === 3) return ('#F8D210')
+          else if(kfalta === 4) return ('#F51720')
+      }
+
+        return (
+          <div className="container-sm mt-5 py-5 bg-light bg-opacity-10 rounded shadow top-5">
+            <p className="p-2 bg-primary-subtle bg-opacity-10 border border-warning border-start-0 rounded-end fst-italic">Lista Solicitudes y Estado de Revisión</p>  
+            <table className="table table-striped">
+            <thead>
+              <tr>
+              <th scope="ID">ID</th>
+                <th scope="Fecha Creado">Fecha Creado</th>
+                <th scope="col">Fecha de Viaje</th>
+                <th scopr="col">Conductor</th>
+                <th scope="col">Desde</th>
+                <th scope="col">Hasta</th>
+                <th scope="col">Puntuación Viaje</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Detalle</th>
+                <th scope="col">Aprovar</th>
+                <th scope="col">Rejectar</th>
+              </tr>
+            </thead>
+            <tbody>
+              {dataSource.map((datos) => (
+                <tr key={datos.id}>
+                  <td scope="row" >{datos.id}</td>
+                  <td scope="row">{dayjs(datos.fechaCreado).format("DD/MM/YYYY")}</td>
+                  <td scope="row">{dayjs(datos.fechaViaje).format("DD/MM/YYYY")}</td>
+                  <td>{datos.nombreConductor}</td>
+                  <td>{datos.lugarSalida}</td>
+                  <td>{datos.lugarLlegada}</td>
+                  <td><p className="badge rounded-pill text-white text-center fs-6" style={{"backgroundColor": bcolor(datos.niveL)}}>{datos.valor}</p></td>
+                  <td scope="row"><p className="badge rounded-pill text-white fs-6" style={{"backgroundColor": bcolor(datos.estado)}}>{datos.estado}</p> </td>
+                  <td><button className="btn bg-info text-white" onClick={() => {handCheck(datos.id)}}>Ver</button></td>
+                  <td><button className="btn bg-success text-white" onClick={() => {handAprover(datos.id, datos.creadoPor, "Aprobado", datos.valor, datos.niveL, datos.emailaprobador, dayjs(datos.fechaViaje).format("DD/MM/YYYY"), datos.motivoViaje, dayjs(datos.horaSalida).format("h:mm A"))}} hidden={datos.estado != "Pendiente" ? true : false}>√</button></td>
+                  <td><button className="btn bg-danger text-white" onClick={() => {handAprover(datos.id, datos.creadoPor, "Rejectado", datos.valor, datos.niveL, datos.emailaprobador, dayjs(datos.fechaViaje).format("DD/MM/YYYY"), datos.motivoViaje, dayjs(datos.horaSalida).format("h:mm A"))}} hidden={datos.estado != "Pendiente" ? true : false}>X</button></td>
+               </tr>
+              ))}
+            </tbody>
+          </table>
+          </div>
+        )
+      }
+
+  //</script>

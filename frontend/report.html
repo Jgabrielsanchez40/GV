@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Roboto";
+      }
+      .container {
+        width: 80%;
+        height: 100%;
+        margin: 0 auto;
+        align-content: center;
+        border-radius: 40px 10px;
+        background-color: rgb(249, 250, 253);
+        box-shadow: #464846;
+      }
+      .card {
+        height: auto;
+        width: auto;
+        box-shadow: #464846;
+      }
+      .card-header {
+        padding: 0.1rem;
+        background-color: rgb(197, 199, 206);
+        height: 4rem;
+        border-radius: 40px 10px;
+      }
+      .spa {
+        margin-top: 18px;
+        margin-left: 14px;
+      }
+      .card-body {
+        height: auto;
+        margin-left: 14px;
+      }
+      .btn {
+        background-color: #464846;
+        color: rgb(249, 250, 253);
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 40px 40px 40px 40px;
+      }
+
+      .btn:hover {
+        background-color: #0f2b9d;
+        color: rgb(249, 250, 253);
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th {
+        background-color: #2a2c2b;
+        color: white;
+        padding: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="card-header">
+          <p class="spa">
+            Gerenciamiento de Viaje:
+            <?= usuario.id ?>
+          </p>
+        </div>
+        <div class="card-body">
+          <h5 class="card-text">
+            Solicitud Realizado Por:
+            <?= usuario.creadoPor ?>
+          </h5>
+          <h5 class="card-text">
+            Aprobador:
+            <?= usuario.emailaprobador ?>
+          </h5>
+          <table>
+            <thead>
+              <th>Fecha Viaje</th>
+              <th>Hora Salida</th>
+              <th>Puntuación Viaje</th>
+              <th>Nivel</th>
+              <th>Estado</th>
+            </thead>
+            <tbody>
+              <td><?= usuario.fechaViaje?></td>
+              <td><?= usuario.horaSalida ?></td>
+              <td><?= usuario.valor ?></td>
+              <td><?= usuario.niveL ?></td>
+              <td
+                {usuario.estado="Pendiente"
+                ?
+                style="background-color: #ffbb5c"
+                :
+                style="background-color: #639df5"
+              >
+                <?= usuario.estado ?>
+              </td>
+            </tbody>
+          </table>
+          <p class="card-text">
+            Motivo del Viaje:
+            <?= usuario.motivoViaje?>
+          </p>
+          <hr />
+          <br />
+          <a
+            href="https://script.google.com/a/macros/sinoenergycorp.com/s/AKfycbxnkXW82LcFdGrrVauodx5r86q-PDC2HviIkVBhIawn/dev"
+            class="btn"
+            >Link Aplicación</a
+          >
+          <br />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

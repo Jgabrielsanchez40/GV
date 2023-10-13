@@ -1,35 +1,29 @@
 //<script type="text/jsx">
 
 let creado;
-
 function listaRequest() {
    const [dataSource, setdataSource] = useState([]);
    useEffect(listar, [])
    const history = useHistory()
 
-    function User() {
-      google.script.run.withSuccessHandler(res => {
+    async function User() {
+      await google.script.run.withSuccessHandler(res => {
           creado = (res)
     }).email();
   }  
     
     async function listar() {
       User();
-      
        await google.script.run.withSuccessHandler(res => {
         const request = JSON.parse(res);
         let arreglo = [];
-        
-        request.map(user => {
+        request
+        .sort((a, b) =>  b.fechaCreado > a.fechaCreado ? 1 : -1)
+        .map(user => {
           if(user.creadoPor === creado) {
             arreglo.push({...user})
           }
-          
         })
-        
-        /* request.map(user => {
-          arreglo.push({...user})
-        }) */
         setdataSource(arreglo);
        }).listarRequest();
       }
@@ -37,19 +31,32 @@ function listaRequest() {
       function handCheck(id) {
         history.push("/formEdit/" + id)
       }
-      
+
+      const bcolor = (kfalta) => {
+        if(kfalta == "Rejectado") return ('#dc3545') 
+        else if(kfalta == "Pendiente") return ('#ffc107')
+        else if(kfalta == "Aprobado") return ('#198754')
+
+        else if(kfalta === 1) return ('#18A558')
+        else if(kfalta === 2) return ('#D6AD60')
+        else if(kfalta === 3) return ('#F8D210')
+        else if(kfalta === 4) return ('#F51720')
+      }
+
       return (
         <div className="container-sm mt-5 py-5 bg-light bg-opacity-10 rounded shadow top-5">
+          <p className="p-2 bg-primary-subtle bg-opacity-10 border border-warning border-start-0 rounded-end fst-italic">Lista Mis Solicitudes y Estado de Revisión</p>  
           <table className="table table-striped">
           <thead>
             <tr>
             <th scope="ID">ID</th>
               <th scope="Fecha Creado">Fecha Creado</th>
-              <th scope="col">Estado</th>
               <th scope="col">Fecha de Viaje</th>
               <th scope="col">Desde</th>
               <th scope="col">Hasta</th>
               <th scope="col">Puntuación Viaje</th>
+              <th scope="col">Aprobador</th>
+              <th scope="col">Estado</th>
               <th scope="col">Acción</th>
             </tr>
           </thead>
@@ -57,13 +64,14 @@ function listaRequest() {
             {dataSource.map((datos) => ( 
               <tr key={datos.id}>
                 <td scope="row" >{datos.id}</td>
-                <td scope="row">{datos.fechaCreado}</td>
-                <td scope="row">{datos.estado}</td>
-                <td>{datos.fechaViaje}</td>
+                <td scope="row">{dayjs(datos.fechaCreado).format("DD/MM/YYYY")}</td>
+                <td scope="row">{dayjs(datos.fechaViaje).format("DD/MM/YYYY")}</td>
                 <td>{datos.lugarSalida}</td>
                 <td>{datos.lugarLlegada}</td>
-                <td>{datos.valor}</td>
-                  <td><button className="btn bg-success text-white" onClick={() => {handCheck(datos.id)}}>Ver</button> 
+                <td><p className="badge rounded-pill text-white text-center fs-6" style={{"backgroundColor": bcolor(datos.niveL)}}>{datos.valor}</p></td>
+                <td>{datos.nombreAprovador}</td>
+                <td scope="row"><p className="badge rounded-pill text-white fs-6" style={{"backgroundColor": bcolor(datos.estado)}}>{datos.estado}</p></td>
+                  <td><button className="btn bg-info text-white" onClick={() => {handCheck(datos.id)}}>Ver</button> 
                    {/* { datos.estado === 'Pendiente' ? <button onClick={() => {handCheck(datos.estado, datos.id)}}>Editar</button> : <button>Ver</button> } */}
                 </td>
              </tr>
