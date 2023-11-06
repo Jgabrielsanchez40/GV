@@ -35,7 +35,7 @@ let dato;
             secuenciaViajes: " ",
             puntosReunion: " ",
             formatoEME1: " ",
-            EME1VehiculoCondicion: " ",
+            EME1VehiCondicion: " ",
             DrivePA: " ",
             observaciones: " ",
         })
@@ -47,6 +47,7 @@ let dato;
                    setData({
                     fechaCreado: dato.fechaCreado,
                     fechaViaje: dato.fechaViaje,
+                    creadoPor: dato.creadoPor,
                     estado: dato.estado,
                     valor: dato.valor,
                     empresa: dato.empresa,
@@ -74,7 +75,7 @@ let dato;
                     secuenciaViaje: dato.secuenciaViaje,
                     puntosReunion: dato.puntosReunion,
                     formatoEME1: dato.formatoEME1,
-                    EME1VehiculoCondicion: dato.EME1VehiculoCondicion,
+                    EME1VehiCondicion: dato.EME1VehiCondicion,
                     DrivePA: dato.DrivePA,
                     observaciones: dato.observaciones,
                    })
@@ -122,10 +123,10 @@ let dato;
     
                         <div className="row g-2">
                             <div className="col">
-                            <div className="input-group input-group-sm mb-3">
+                            {/* <div className="input-group input-group-sm mb-3">
                                 <span className="input-group-text" >Viaje Necesario</span>
                                 <span type="date" className="form-control">{data.viajenecesario}</span>
-                            </div>
+                            </div> */}
                             <div className="input-group input-group-sm mb-3">
                                 <span className="input-group-text">Motivo del Viaje</span>
                                 <span type="date" className="form-control">{data.motivoViaje}</span>
@@ -211,7 +212,7 @@ let dato;
                  <div className="card shadow bg-body-tertiary rounded mb-3">
                 <div className="card-header bg-secondary text-white">Evaluaciones</div>
                     <div className="card-body">
-                    <div className="badge bg-primary text-white mt-1 mb-3" style={{fontSize: '.9rem'}}>Evaluo Viaje: {data.valor}</div>
+                    <div><p className="badge bg-primary text-white mt-1 mb-3" style={{fontSize: '.9rem'}}>Evaluo Viaje: </p> <p className="badge bg-info text-white" style={{fontSize: '.9rem'}}>{data.valor}</p></div>
                         <div className="row g-2">
                                 <div className="col">
                                     <div className="input-group input-group-sm mb-3">
@@ -312,7 +313,7 @@ let dato;
                             <div className="col">
                                     <div className="input-group input-group-sm mb-3">
                                         <span className="input-group-text">Segun Inspección EME-1, vehiculo en condición para Viaje</span>
-                                        <span type="date" className="form-control">{data.EME1VehiculoCondicion}</span>
+                                        <span type="date" className="form-control">{data.EME1VehiCondicion}</span>
                                     </div>
                             </div>
                         </div>

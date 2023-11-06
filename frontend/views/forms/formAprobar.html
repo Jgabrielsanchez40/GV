@@ -1,0 +1,204 @@
+//<script type="text/jsx">
+
+  let creado;
+  const fechaAprovado = new Date().toLocaleString() + " ";
+  function formAprobar() {
+     const [dataSource, setdataSource] = useState([]);
+     const [dataSearch, setdataSearch] = useState([]);
+     const [valoridGV, setValoridGV] = useState()
+     const [view, setView] = useState(true)
+
+     useEffect(listar, [])
+     const history = useHistory()
+
+      async function User() {
+        await google.script.run.withSuccessHandler(res => {
+            creado = (res)
+      }).email();
+    }
+
+      async function listar() {
+        User();
+        console.log(dataSearch)
+         await google.script.run.withSuccessHandler(res => {
+          const request = JSON.parse(res);
+          let arreglo = [];
+          request
+          .sort((a, b) =>  b.fechaCreado > a.fechaCreado ? 1 : -1)
+          .map(user => {
+            if(user.emailaprobador === creado) {
+              arreglo.push({...user})
+              setView(false)
+            }
+          })
+          setdataSource(arreglo);
+         }).listarEstado("Pendiente");
+        }
+
+    function search(e) {
+        const { value } = e.target;
+        setValoridGV(value)
+    }
+
+    function searchGV() {
+      console.log(valoridGV)
+       const data = dataSearch.filter((dato) => dato.id === valoridGV)
+       setdataSearch(data)
+       console.log(data)
+    }
+
+    async function listarOtros() {
+          User();
+           await google.script.run.withSuccessHandler(res => {
+            const request = JSON.parse(res);
+            let arreglo = [];
+            request
+            .sort((a, b) =>  b.fechaCreado > a.fechaCreado ? 1 : -1)
+            .map(user => {
+              if(user.emailaprobador === creado) {
+                arreglo.push({...user})
+              }
+            })
+            setdataSearch(arreglo);
+           }).listarEstado("Aprobado");
+    }
+  
+
+        function handCheck(id) {
+          history.push("/formEdit/" + id)
+        }
+
+        async function handAprover(id, creadoPor, estado, valor, niveL, emailaprobador, fechaViaje, motivoViaje, horaSalida) {
+          await google.script.run.withSuccessHandler(res => {
+           listar()
+           Semail(id, fechaAprovado, creadoPor, estado, valor, niveL, emailaprobador, fechaViaje, motivoViaje, horaSalida)
+          }).resAprovado(id, estado, fechaAprovado)
+        }
+
+        function Semail(id, fechaCreado, creadoPor, estado, valor, niveL, emailaprobador, fechaViaje, motivoViaje, horaSalida) {
+          google.script.run.withSuccessHandler(resp => {
+           // console.log(resp)
+          }).emailSend(id, fechaCreado, creadoPor, estado, valor, niveL, emailaprobador, fechaViaje, motivoViaje, horaSalida)
+        }
+
+        const bcolor = (kfalta) => {
+          if(kfalta == "Rejectado") return ('#dc3545')
+          else if(kfalta == "Pendiente") return ('#ffc107')
+          else if(kfalta == "Aprobado") return ('#198754')
+          else if(kfalta == "Cerrado") return ('#565051')
+
+          else if(kfalta === 1) return ('#18A558')
+          else if(kfalta === 2) return ('#D6AD60')
+          else if(kfalta === 3) return ('#F8D210')
+          else if(kfalta === 4) return ('#F51720')
+      }
+
+        return (
+          <div>
+            <div hidden={!view}>
+              <h1 >No Posee Acceso</h1>
+            </div>
+            <div hidden={view}>
+            <div className="container-sm mt-1 py-5 bg-light bg-opacity-10 rounded shadow top-5">
+            <div className="badge bg-primary-subtle text-black fst-italic mb-3" style={{fontSize: '1rem'}}>Email Aprobador: {creado}</div>
+              <p className="p-2 bg-primary-subtle bg-opacity-10 border border-warning border-start-0 rounded-end fst-italic">Lista Solicitudes Estado: Pendiente</p>  
+              <table className="table table-striped">
+              <thead>
+                <tr>
+                <th scope="ID">ID</th>
+                  <th scope="Fecha Creado">Fecha Creado</th>
+                  <th scope="col">Fecha de Viaje</th>
+                  <th scopr="col">Conductor</th>
+                  <th scope="col">Desde</th>
+                  <th scope="col">Hasta</th>
+                  <th scope="col">Puntuación Viaje</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Detalle</th>
+                  <th scope="col">Aprobar</th>
+                  <th scope="col">Rejectar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dataSource.map((datos) => (
+                  <tr key={datos.id}>
+                    <td scope="row" >{datos.id}</td>
+                    <td scope="row">{dayjs(datos.fechaCreado).format("DD/MM/YYYY")}</td>
+                    <td scope="row">{dayjs(datos.fechaViaje).format("DD/MM/YYYY")}</td>
+                    <td>{datos.nombreConductor}</td>
+                    <td>{datos.lugarSalida}</td>
+                    <td>{datos.lugarLlegada}</td>
+                    <td><p className="badge rounded-pill text-white text-center fs-6" style={{"backgroundColor": bcolor(datos.niveL)}}>{datos.valor}</p></td>
+                    <td scope="row"><p className="badge rounded-pill text-white fs-6" style={{"backgroundColor": bcolor(datos.estado)}}>{datos.estado}</p> </td>
+                    <td><button className="btn bg-info text-white" onClick={() => {handCheck(datos.id)}}>Ver</button></td>
+                    <td><button className="btn bg-success text-white" onClick={() => {handAprover(datos.id, datos.creadoPor, "Aprobado", datos.valor, datos.niveL, datos.emailaprobador, dayjs(datos.fechaViaje).format("DD/MM/YYYY"), datos.motivoViaje, dayjs(datos.horaSalida).format("h:mm A"))}} hidden={datos.estado != "Pendiente" ? true : false}>√</button></td>
+                    <td><button className="btn bg-danger text-white" onClick={() => {handAprover(datos.id, datos.creadoPor, "Rejectado", datos.valor, datos.niveL, datos.emailaprobador, dayjs(datos.fechaViaje).format("DD/MM/YYYY"), datos.motivoViaje, dayjs(datos.horaSalida).format("h:mm A"))}} hidden={datos.estado != "Pendiente" ? true : false}>X</button></td>
+                </tr>
+                ))}
+              </tbody>
+              </table>
+            </div>
+
+            <div className="container-sm rounded shadow" style={{"marginTop": '2rem'}}>
+            <p className="p-2 bg-primary-subtle bg-opacity-10 border border-warning border-start-0 rounded-end fst-italic">Lista Solicitudes Estado: Aprobados - Rejectados - Cerrados</p>  
+              <div className="d-flex justify-content-start">
+              <div className="col-4">
+                <button className="btn bg-primary text-white" onClick={listarOtros}>Mostrar</button>
+              </div>
+                  <div className="col-4" hidden={ dataSearch.length === 0 ? true : false}>
+                    <div className="d-flex justify-content-start">
+                    <span className="input-group-text">Buscar GV: </span>
+                    <input type="text" name="sidtr" className="form-control" onChange={search}></input>
+                    <button className="btn bg-primary text-white" style={{ blockSize: '2.5rem' }} onClick={searchGV}>Buscar</button>
+                    </div>
+                  </div>
+              </div>
+           
+            <div className="container-sm rounded shadow" style={{"marginTop": '2rem'}} hidden={ dataSearch.length === 0 ? true : false}>
+              <table className="table table-striped">
+              <thead>
+                <tr>
+                <th scope="ID">ID</th>
+                  <th scope="Fecha Creado">Fecha Creado</th>
+                  <th scope="col">Fecha de Viaje</th>
+                  <th scopr="col">Conductor</th>
+                  <th scope="col">Desde</th>
+                  <th scope="col">Hasta</th>
+                  <th scope="col">Puntuación Viaje</th>
+                  <th scope="col">Fecha Aprobado/Rejectado</th>
+                  <th scope="col">Fecha Cierre</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Detalle</th>
+                  <th scope="col">Aprobar</th>
+                  <th scope="col">Rejectar</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dataSearch.map((datos) => (
+                  <tr key={datos.id}>
+                    <td scope="row" >{datos.id}</td>
+                    <td scope="row">{dayjs(datos.fechaCreado).format("DD/MM/YYYY")}</td>
+                    <td scope="row">{dayjs(datos.fechaViaje).format("DD/MM/YYYY")}</td>
+                    <td>{datos.nombreConductor}</td>
+                    <td>{datos.lugarSalida}</td>
+                    <td>{datos.lugarLlegada}</td>
+                    <td>{datos.valor}</td>
+                    <td>{datos.fechaAprovado != "" ? dayjs(datos.fechaAprovado).format("DD/MM/YYYY") : "-"}</td>
+                    <td>{datos.fechaCierre != "" ? dayjs(datos.fechaCierre).format("DD/MM/YYYY") : "-"}</td>
+                    <td><p className="badge rounded-pill text-white text-center fs-6" style={{"backgroundColor": bcolor(datos.niveL)}}>{datos.valor}</p></td>
+                    <td scope="row"><p className="badge rounded-pill text-white fs-6" style={{"backgroundColor": bcolor(datos.estado)}}>{datos.estado}</p> </td>
+                    <td><button className="btn bg-info text-white" onClick={() => {handCheck(datos.id)}}>Ver</button></td>
+                    <td><button className="btn bg-success text-white" onClick={() => {handAprover(datos.id, datos.creadoPor, "Aprobado", datos.valor, datos.niveL, datos.emailaprobador, dayjs(datos.fechaViaje).format("DD/MM/YYYY"), datos.motivoViaje, dayjs(datos.horaSalida).format("h:mm A"))}} hidden={datos.estado != "Pendiente" ? true : false}>√</button></td>
+                    <td><button className="btn bg-danger text-white" onClick={() => {handAprover(datos.id, datos.creadoPor, "Rejectado", datos.valor, datos.niveL, datos.emailaprobador, dayjs(datos.fechaViaje).format("DD/MM/YYYY"), datos.motivoViaje, dayjs(datos.horaSalida).format("h:mm A"))}} hidden={datos.estado != "Pendiente" ? true : false}>X</button></td>
+                </tr>
+                ))}
+              </tbody>
+            </table>
+            </div>
+            </div>
+          </div>
+          </div>
+          
+        )
+      }
+
+  //</script>

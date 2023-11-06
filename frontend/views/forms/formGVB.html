@@ -1,7 +1,6 @@
 //<script type="text/jsx">
   var n, id;
   const fechaCreado = new Date().toLocaleString() + " ";
-  const fechaAprovado = fechaCreado
   const a = [0, 0, 0, 0, 0, 0, 0,0];
   let valor = 0; 
   let niveL = 0;
@@ -18,6 +17,7 @@
       const [registre, setRegistre] = useState(true);
       const [aprobador, setAprobador] = useState(false);
       const [recurso, setRecurso] = useState([])
+      const history = useHistory()
 
       function User() {
           google.script.run.withSuccessHandler(res => {
@@ -143,7 +143,8 @@
               notificacionTareaTerminada(resp.titulo, resp.descripcion);
               valor = 0;
               niveL = 0;
-          }).saveGV(JSON.stringify({ id, fechaCreado, fechaAprovado, creadoPor, estado, valor, niveL, nombreAprovador, emailaprobador, ...values } ));
+              history.push("/listaRequest/")
+          }).saveGV(JSON.stringify({ id, fechaCreado, creadoPor, estado, valor, niveL, nombreAprovador, emailaprobador, ...values } ));
       }
 
       const handApprovador = async () => {
@@ -225,7 +226,7 @@
                       </div>
                       <div className="row g-2">
                           <div className="col">
-                          <div className="input-group input-group-sm mb-3">
+                          {/* <div className="input-group input-group-sm mb-3">
                               <span className="input-group-text" >Viaje Necesario</span>
                               <div className="flex-sm justify-content-evenly">
                               <div className="form-check form-check-inline">
@@ -237,7 +238,7 @@
                                   <label className="form-check-label">NO</label>
                               </div>
                               </div>
-                          </div>
+                          </div> */}
                           <div className="input-group input-group-sm mb-3">
                               <span className="input-group-text">Motivo del Viaje</span>
                               <input type="text" className="form-control" name="motivoViaje" onChange={checkData} required></input>
@@ -291,11 +292,7 @@
                                   <option value={data.vpropio} key={data.idvpropio}>{data.vpropio}</option>
                                   ))}
                                </select>
-                               <select className="form-select form-select-sm" name="vehiculo" onChange={checkData} hidden={hid2}>
-                                  <option>Seleccione Vehiculo</option>
-                                  <option value="Tecero">Tecero</option>
-                                  <option value="Tecero">Tecero1</option>
-                              </select>
+                               <input className="form-control" style={{fontSize: '.8rem'}} type="text" name="vehiculo" onChange={checkData} hidden={hid2} placeholder="Agregue La Placa"></input>
                           </div>
                           <div className="col">
                               <div className="input-group input-group-sm mb-3" hidden={hid1}>
@@ -331,7 +328,7 @@
               <div className="card shadow bg-body-tertiary rounded mb-3">
               <div className="card-header bg-secondary text-white">Evaluaciones</div>
                   <div className="card-body">
-                  <div className="badge bg-primary text-white mt-1 mb-3" style={{fontSize: '.9rem'}}>Evaluo Viaje: {valor}</div>
+                  <div><p className="badge bg-primary text-white mt-1 mb-3" style={{fontSize: '.9rem'}}>Evaluo Viaje:</p> <p className="badge bg-info text-white" style={{fontSize: '.9rem'}}>{valor}</p></div>
                       <div className="row g-2">
                               <div className="col">
                                   <div className="input-group input-group-sm mb-3">

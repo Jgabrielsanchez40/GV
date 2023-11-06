@@ -1,5 +1,5 @@
 //<script type="text/jsx">
-
+const fechaClosed = new Date().toLocaleString() + " ";
 let creado;
 function listaRequest() {
    const [dataSource, setdataSource] = useState([]);
@@ -32,10 +32,18 @@ function listaRequest() {
         history.push("/formEdit/" + id)
       }
 
+      async function closedGV(id) {
+        console.log(id)
+        await google.script.run.withSuccessHandler(res => {
+          listar()
+        }).closeGV(id, creado, fechaClosed)
+      }
+
       const bcolor = (kfalta) => {
         if(kfalta == "Rejectado") return ('#dc3545') 
         else if(kfalta == "Pendiente") return ('#ffc107')
         else if(kfalta == "Aprobado") return ('#198754')
+        else if(kfalta == "Cerrado") return ('#565051')
 
         else if(kfalta === 1) return ('#18A558')
         else if(kfalta === 2) return ('#D6AD60')
@@ -44,7 +52,8 @@ function listaRequest() {
       }
 
       return (
-        <div className="container-sm mt-5 py-5 bg-light bg-opacity-10 rounded shadow top-5">
+        <div className="container-sm mt-1 py-5 bg-light bg-opacity-10 rounded shadow">
+          <div className="badge bg-primary-subtle text-black fst-italic mb-3" style={{fontSize: '1rem'}}>Email Colaborador: {creado}</div>
           <p className="p-2 bg-primary-subtle bg-opacity-10 border border-warning border-start-0 rounded-end fst-italic">Lista Mis Solicitudes y Estado de Revisión</p>  
           <table className="table table-striped">
           <thead>
@@ -56,6 +65,8 @@ function listaRequest() {
               <th scope="col">Hasta</th>
               <th scope="col">Puntuación Viaje</th>
               <th scope="col">Aprobador</th>
+              <th scope="col">Fecha Aprobado</th>
+              <th scope="col">Fecha Cierre</th>
               <th scope="col">Estado</th>
               <th scope="col">Acción</th>
             </tr>
@@ -70,10 +81,11 @@ function listaRequest() {
                 <td>{datos.lugarLlegada}</td>
                 <td><p className="badge rounded-pill text-white text-center fs-6" style={{"backgroundColor": bcolor(datos.niveL)}}>{datos.valor}</p></td>
                 <td>{datos.nombreAprovador}</td>
+                <td>{datos.fechaAprovado != "" ? dayjs(datos.fechaAprovado).format("DD/MM/YYYY") : "-"}</td>
+                <td>{datos.fechaCierre != "" ? dayjs(datos.fechaCierre).format("DD/MM/YYYY") : "-"}</td>
                 <td scope="row"><p className="badge rounded-pill text-white fs-6" style={{"backgroundColor": bcolor(datos.estado)}}>{datos.estado}</p></td>
                   <td><button className="btn bg-info text-white" onClick={() => {handCheck(datos.id)}}>Ver</button> 
-                   {/* { datos.estado === 'Pendiente' ? <button onClick={() => {handCheck(datos.estado, datos.id)}}>Editar</button> : <button>Ver</button> } */}
-                </td>
+                  { datos.estado === 'Aprobado' ? <button className="btn bg-success text-white ms-2" onClick={() => {closedGV(datos.id)}}>Cerrar</button> : ' ' }</td>
              </tr>
              
             ))}

@@ -79,3 +79,26 @@ function emailSend(id, fechaCreado, creadoPor, estado, valor, niveL, emailaproba
   }
  
 }
+
+function closeGV(id, CerradoPor, fechaCierre) {
+  try {
+    const sheet = obtenerSheet(env_().SH_REGISTRO_GV);
+    const cRows = obtenerRows(env_().SH_REGISTRO_GV);
+    var gv = sheet.getDataRange().getValues();
+    for (var i = 0; i < cRows; i++) {
+      if (gv[i][0] == id) {
+        var j = 1 + i;
+        sheet.getRange(j, 5).setValue("Cerrado");
+        sheet.getRange(j, 39).setValue(fechaCierre);
+        sheet.getRange(j, 40).setValue(CerradoPor);
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function listarEstado(estado) {
+  return JSON.stringify(readEstado(obtenerSheet(env_().SH_REGISTRO_GV), estado))
+ 
+}
