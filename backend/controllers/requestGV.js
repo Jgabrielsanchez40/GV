@@ -56,6 +56,10 @@ function listarRecursos(id = undefined) {
   return JSON.stringify(_read(obtenerSheet(env_().SH_REGISTRO_RECURSO), id));
 }
 
+/* function listarRecursos(Activo) {
+  return JSON.stringify(_readVEH(obtenerSheetVEH(env_().SH_DBVehiculo_VEHICULO), Activo));
+} */
+
 function emailSend(id, fechaCreado, creadoPor, estado, valor, niveL, emailaprobador, fechaViaje, motivoViaje, horaSalida) {
   const usuario = { id, fechaCreado, creadoPor, estado, valor, niveL, emailaprobador, fechaViaje, motivoViaje, horaSalida}
   var repo = HtmlService.createTemplateFromFile('frontend/report.html')

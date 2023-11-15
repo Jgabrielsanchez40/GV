@@ -175,7 +175,7 @@
                   arreglo.push({...data})
               })
               setRecurso(arreglo)
-        }).listarRecursos();
+        }).listarRecursos();  //.listarRecursos('Si'); 
       }
 
       function Semail(id, fechaCreado, creadoPor, estado, valor, niveL, emailaprobador, fechaViaje, motivoViaje, horaSalida) {
@@ -291,6 +291,10 @@
                               { recurso.map((data) =>  (
                                   <option value={data.vpropio} key={data.idvpropio}>{data.vpropio}</option>
                                   ))}
+
+                           {/*  { recurso.map((data) =>  (
+                                  <option value={data.vehiculo} key={data.key}>{data.vehiculo}</option>
+                                  ))} */}
                                </select>
                                <input className="form-control" style={{fontSize: '.8rem'}} type="text" name="vehiculo" onChange={checkData} hidden={hid2} placeholder="Agregue La Placa"></input>
                           </div>

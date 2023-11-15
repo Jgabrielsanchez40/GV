@@ -18,3 +18,13 @@ function perfilUsuario() {
     return Session.getActiveUser().getEmail()
     //return google.script.run.withSuccessHandler(setEmail).getEmail();
 }
+
+//Vehiculo
+
+function conexVehiculo() {
+    return SpreadsheetApp.openById(env_().ID_DBVehiculo);
+}
+
+function obtenerSheetVEH(NAME) {
+    return conexVehiculo().getSheetByName(NAME);
+}
