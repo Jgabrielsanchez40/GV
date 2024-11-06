@@ -1,12 +1,13 @@
 //<script type="text/jsx">
 
   let creado;
+ // let view = 0
   const fechaAprovado = new Date().toLocaleString() + " ";
   function formAprobar() {
      const [dataSource, setdataSource] = useState([]);
      const [dataSearch, setdataSearch] = useState([]);
      const [valoridGV, setValoridGV] = useState()
-     const [view, setView] = useState(true)
+     let [view, setView] = useState(true)
 
      useEffect(listar, [])
      const history = useHistory()
@@ -14,12 +15,26 @@
       async function User() {
         await google.script.run.withSuccessHandler(res => {
             creado = (res)
+            listarAprovador()
       }).email();
     }
+    
+    async function listarAprovador() {
+      await google.script.run.withSuccessHandler(res => {
+        const result = JSON.parse(res)
+        result.map(user => {
+         if(user.emailaprobador === creado) {
+          console.log(user.emailaprobador)
+          setView(false)
+         }
+        })
+      }).listarAprovador();
+    }
 
+      console.log(view)
       async function listar() {
         User();
-        console.log(dataSearch)
+       // console.log(dataSearch)
          await google.script.run.withSuccessHandler(res => {
           const request = JSON.parse(res);
           let arreglo = [];
@@ -28,7 +43,7 @@
           .map(user => {
             if(user.emailaprobador === creado) {
               arreglo.push({...user})
-              setView(false)
+              //setView(false)
             }
           })
           setdataSource(arreglo);
@@ -41,10 +56,10 @@
     }
 
     function searchGV() {
-      console.log(valoridGV)
+      //console.log(valoridGV)
        const data = dataSearch.filter((dato) => dato.id === valoridGV)
        setdataSearch(data)
-       console.log(data)
+       //console.log(data)
     }
 
     async function listarOtros() {
@@ -95,12 +110,12 @@
 
         return (
           <div>
-            <div hidden={!view}>
-              <h1 >No Posee Acceso</h1>
+            <div className="container-sm mt-1 py-5 bg-light bg-opacity-10 rounded shadow top-5" hidden={!view}>
+              <h1 className="text-center">No Posee Acceso</h1>
             </div>
             <div hidden={view}>
-            <div className="container-sm mt-1 py-5 bg-light bg-opacity-10 rounded shadow top-5">
-            <div className="badge bg-primary-subtle text-black fst-italic mb-3" style={{fontSize: '1rem'}}>Email Aprobador: {creado}</div>
+            <div className="container-sm py-5 bg-light bg-opacity-10 rounded shadow top-5">
+              <div className="badge bg-primary-subtle text-black fst-italic mb-3" style={{fontSize: '1rem'}}>Email Colaborador: {creado}</div>
               <p className="p-2 bg-primary-subtle bg-opacity-10 border border-warning border-start-0 rounded-end fst-italic">Lista Solicitudes Estado: Pendiente</p>  
               <table className="table table-striped">
               <thead>
